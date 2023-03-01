@@ -11,6 +11,7 @@ using System.Data;
 
 namespace GerenciamentoEstoque.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/itemestoque")]
     public class ItemEstoqueController : Controller

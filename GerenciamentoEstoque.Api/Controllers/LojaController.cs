@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace GerenciamentoEstoque.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/loja")]
     public class LojaController : Controller
