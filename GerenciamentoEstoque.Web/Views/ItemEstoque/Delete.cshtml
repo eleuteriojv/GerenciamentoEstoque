@@ -1,0 +1,48 @@
+﻿@model GerenciamentoEstoque.Web.ViewModels.ItemEstoqueViewModel
+
+@{
+    ViewData["Title"] = "Remover Item da Loja";
+}
+
+
+<div>
+    <h3>Remover Item da Loja</h3>
+    <br />
+    <h4>Você tem certeza que deseja remover?</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Quantidade):
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Quantidade)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Produtos.Nome):
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Produtos.Nome)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Produtos.Preco):
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Produtos.Preco)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Lojas.Nome):
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Lojas.Nome)
+        </dd>
+
+    </dl>
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="LojaId"/>
+        <input type="hidden" asp-for="Quantidade" />
+        <input type="hidden" asp-for="ProdutoId"/>
+        <input type="button" class="btn btn-danger" value="Voltar" onclick="history.back()">
+        <input type="submit" value="Remover" class="btn btn-primary" />
+    </form>
+</div>
+

@@ -1,0 +1,42 @@
+﻿@model GerenciamentoEstoque.Web.ViewModels.ItemEstoqueViewModel
+
+@{
+    ViewData["Title"] = "Detalhes";
+}
+
+<h1>Detalhes</h1>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Quantidade):
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Quantidade)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Produtos.Nome):
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Produtos.Nome)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Produtos.Preco):
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Produtos.Preco)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Lojas.Nome):
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Lojas.Nome)
+        </dd>
+
+    </dl>
+</div>
+<div>
+    <input type="button" class="btn btn-danger" value="Voltar" onclick="history.back()">
+    <a class="btn btn-success" asp-action="Edit" asp-route-idProduto="@Model.ProdutoId" asp-route-idLoja="@Model.LojaId">Editar</a>
+
+</div>

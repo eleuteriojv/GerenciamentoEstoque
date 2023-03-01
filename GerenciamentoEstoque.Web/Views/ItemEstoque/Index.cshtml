@@ -42,12 +42,12 @@
                     @Html.DisplayFor(modelItem => item.Produtos.Nome)
                 </td>
                 <td>
-                    R$ @Html.DisplayFor(modelItem => item.Produtos.Preco)
+                   @Html.DisplayFor(modelItem => item.Produtos.Preco)
                 </td>
                 <td>
-                    <a class="btn btn-success" asp-action="Edit" asp-route-id="@item.ProdutoId , @item.LojaId">Editar</a>
-                    <a class="btn btn-warning" asp-action="Details" asp-route-id="@item.ProdutoId , @item.LojaId">Detalhes</a>
-                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.ProdutoId , @item.LojaId">Remover</a>
+                    <a class="btn btn-success" asp-action="Edit" asp-route-idProduto="@item.ProdutoId" asp-route-idLoja="@item.LojaId">Editar</a>
+                    <a class="btn btn-warning" asp-action="Details" asp-route-idProduto="@item.ProdutoId" asp-route-idLoja="@item.LojaId">Detalhes</a>
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-idProduto="@item.ProdutoId" asp-route-idLoja="@item.LojaId">Remover</a>
                 </td>
             </tr>
         }

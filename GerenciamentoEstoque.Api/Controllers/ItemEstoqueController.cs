@@ -32,10 +32,13 @@ namespace GerenciamentoEstoque.Api.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ItemEstoque>> Get(ItemEstoque item)
+        [HttpGet("{idProduto}/{idLoja}")]
+        public async Task<ActionResult<ItemEstoque>> Get(int idProduto, int idLoja)
         {
-            var itemEstoque = await _context.ItemEstoques.FindAsync(item.ProdutoId, item.LojaId);
+            var itemEstoque = await _context.ItemEstoques
+                .Include(x => x.Produtos)
+                .Include(x => x.Lojas)
+                .FirstOrDefaultAsync(x => x.ProdutoId == idProduto && x.LojaId == idLoja);
 
             if (itemEstoque == null)
             {
@@ -79,10 +82,13 @@ namespace GerenciamentoEstoque.Api.Controllers
 
             return NoContent();
         }
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("{idProduto}/{idLoja}")]
+        public async Task<IActionResult> Delete(int idProduto, int idLoja)
         {
-            var itemEstoque = await _context.ItemEstoques.FindAsync(id);
+            var itemEstoque = await _context.ItemEstoques
+                .Include(x => x.Produtos)
+                .Include(x => x.Lojas)
+                .FirstOrDefaultAsync(x => x.ProdutoId == idProduto && x.LojaId == idLoja);
 
             if (itemEstoque == null)
             {

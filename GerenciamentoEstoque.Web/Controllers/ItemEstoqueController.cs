@@ -65,7 +65,7 @@ namespace GerenciamentoEstoque.Web.Controllers
                 {
                     string conteudo = await responses.Content.ReadAsStringAsync();
                     produtos = JsonConvert.DeserializeObject<List<ProdutoViewModel>>(conteudo);
-                    ViewBag.Produtos = produtos.Select(e => new SelectListItem { Text = e.Nome, Value = e.Id.ToString() }).ToList();
+                    ViewBag.Produtos = produtos.Where(x => x.Estoques.Count == 0).Select(e => new SelectListItem { Text = e.Nome, Value = e.Id.ToString() }).ToList();
                 }
                 return View();
             }
@@ -105,6 +105,56 @@ namespace GerenciamentoEstoque.Web.Controllers
             return View(itemEstoque);
         }
         [HttpGet]
+        public async Task<IActionResult> Edit(int idProduto, int idLoja)
+        {
+            try
+            {
+                if (idProduto == 0 && idLoja == 0)
+                {
+                    return BadRequest();
+                }
+
+                ItemEstoqueViewModel item = null;
+                using (var client = new HttpClient())
+                {
+
+                    client.BaseAddress = new Uri(endpoint);
+                    var readTask = client.GetAsync(endpoint + "/" + idProduto + "/" + idLoja);
+                    readTask.Wait();
+                    var result = await readTask;
+                    if (result.IsSuccessStatusCode)
+                    {
+                        string conteudo = await result.Content.ReadAsStringAsync();
+                        item = JsonConvert.DeserializeObject<ItemEstoqueViewModel>(conteudo);
+                        List<SelectListItem> produto = new List<SelectListItem>
+                        {
+                            new SelectListItem
+                            {
+                                Text = item.Produtos.Nome, 
+                                Value = item.Produtos.Id.ToString()
+                            }
+                        };
+                        List<SelectListItem> loja = new List<SelectListItem>
+                        {
+                            new SelectListItem
+                            {
+                                Text = item.Lojas.Nome, 
+                                Value = item.Lojas.Id.ToString()
+                            }
+                        };
+                        ViewBag.Loja = loja;
+                        ViewBag.Produto = produto;
+                        return View(item);
+                    }
+                }
+            }
+            catch
+            {
+                return NotFound();
+            }
+            return View();
+        }
+        [HttpPost]
         public async Task<IActionResult> Edit(ItemEstoqueViewModel item)
         {
             try
@@ -113,50 +163,13 @@ namespace GerenciamentoEstoque.Web.Controllers
                 {
                     return BadRequest();
                 }
-
                 using (var client = new HttpClient())
                 {
-                    client.BaseAddress = new Uri(endpointLoja);
-
-                    // Obtém o produto pelo id
-                    var response = await client.GetAsync("?id=" + item.ProdutoId.ToString() + "?id=" + item.LojaId);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var json = await response.Content.ReadAsStringAsync();
-                        var loja = JsonConvert.DeserializeObject<LojaViewModel[]>(json);
-                        var lojas = loja.Where(x => x.Id == item.LojaId).FirstOrDefault();
-                        return View(lojas);
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(null, "Erro ao processar a solicitação");
-                    }
-                }
-
-                return NotFound();
-            }
-            catch
-            {
-                return NotFound();
-            }
-        }
-        [HttpPost]
-        public async Task<IActionResult> Edit(int id, ItemEstoqueViewModel item)
-        {
-            try
-            {
-                if (item.ProdutoId == 0 && item.LojaId == 0)
-                {
-                    return BadRequest();
-                }
-                using (var client = new HttpClient())
-                {
-                    string data = JsonConvert.SerializeObject(item);
-                    StringContent conteudo = new StringContent(data, Encoding.UTF8, "application/json");
-                    client.BaseAddress = new Uri(endpointLoja);
-                    HttpResponseMessage response = await client.PostAsync(client.BaseAddress + "/" + item.ProdutoId + "/" + item.LojaId, conteudo);
-                    if (response.IsSuccessStatusCode)
+                    client.BaseAddress = new Uri(endpoint);
+                    var putTask = client.PutAsJsonAsync<ItemEstoqueViewModel>(endpoint + "/" + item.ProdutoId + item.LojaId, item);
+                    putTask.Wait();
+                    var result = await putTask;
+                    if (result.IsSuccessStatusCode)
                     {
                         return RedirectToAction("Index");
                     }
@@ -169,27 +182,28 @@ namespace GerenciamentoEstoque.Web.Controllers
             return View(item);
         }
         [HttpGet]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int idProduto, int idLoja)
         {
             try
             {
-                if (id == null)
+                if (idProduto == 0 && idLoja == 0)
                 {
                     return BadRequest();
                 }
-                LojaViewModel loja = null;
+
+                ItemEstoqueViewModel item = null;
                 using (var client = new HttpClient())
                 {
 
-                    client.BaseAddress = new Uri(endpointLoja);
-                    var deleteTask = client.GetAsync(endpointLoja + "/" + id);
-                    deleteTask.Wait();
-                    var result = await deleteTask;
+                    client.BaseAddress = new Uri(endpoint);
+                    var readTask = client.GetAsync(endpoint + "/" + idProduto + "/" + idLoja);
+                    readTask.Wait();
+                    var result = await readTask;
                     if (result.IsSuccessStatusCode)
                     {
                         string conteudo = await result.Content.ReadAsStringAsync();
-                        loja = JsonConvert.DeserializeObject<LojaViewModel>(conteudo);
-                        return View(loja);
+                        item = JsonConvert.DeserializeObject<ItemEstoqueViewModel>(conteudo);
+                        return View(item);
                     }
                 }
             }
@@ -199,19 +213,20 @@ namespace GerenciamentoEstoque.Web.Controllers
             }
             return View();
         }
+
         [HttpPost]
-        public async Task<IActionResult> Delete(LojaViewModel loja)
+        public async Task<IActionResult> Delete(ItemEstoqueViewModel item)
         {
             try
             {
-                if (loja.Id == null)
+                if (item.ProdutoId == 0 && item.LojaId == 0)
                 {
                     return BadRequest();
                 }
                 using (var client = new HttpClient())
                 {
-                    client.BaseAddress = new Uri(endpointLoja);
-                    var deleteTask = client.DeleteAsync(endpointLoja + "/" + loja.Id);
+                    client.BaseAddress = new Uri(endpoint);
+                    var deleteTask = client.DeleteAsync(endpoint + "/" + item.ProdutoId + "/" + item.LojaId);
                     deleteTask.Wait();
                     var result = await deleteTask;
                     if (result.IsSuccessStatusCode)
@@ -226,36 +241,6 @@ namespace GerenciamentoEstoque.Web.Controllers
             }
             return View();
         }
-        [HttpGet]
-        public async Task<IActionResult> Details(int? id)
-        {
-            try
-            {
-                if (id == null)
-                {
-                    return BadRequest();
-                }
-                LojaViewModel loja = new LojaViewModel();
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri(endpointLoja);
-                    var detailsTask = client.GetAsync(endpointLoja + "/" + id);
-                    detailsTask.Wait();
-                    var result = await detailsTask;
-                    if (result.IsSuccessStatusCode)
-                    {
-                        string conteudo = await result.Content.ReadAsStringAsync();
-                        loja = JsonConvert.DeserializeObject<LojaViewModel>(conteudo);
-                        return View(loja);
-                    }
-
-                }
-            }
-            catch
-            {
-                return NotFound();
-            }
-            return View();
-        }
+        
     }
 }
