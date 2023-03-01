@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using GerenciamentoEstoque.Api.Models;
 using GerenciamentoEstoque.Api.Data;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace GerenciamentoEstoque.Api.Controllers
 {

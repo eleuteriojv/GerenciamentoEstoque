@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System;
 using GerenciamentoEstoque.Api.Data;
 using GerenciamentoEstoque.Api.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace GerenciamentoEstoque.Api.Controllers
 {

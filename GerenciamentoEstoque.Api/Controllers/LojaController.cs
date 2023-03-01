@@ -1,8 +1,10 @@
 ﻿using GerenciamentoEstoque.Api.Data;
 using GerenciamentoEstoque.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace GerenciamentoEstoque.Api.Controllers
