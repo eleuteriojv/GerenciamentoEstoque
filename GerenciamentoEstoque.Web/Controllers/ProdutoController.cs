@@ -106,17 +106,17 @@ namespace GerenciamentoEstoque.Web.Controllers
         {
             try
             {
-                if (id != produto.Id)
+                if (produto == null)
                 {
                     return BadRequest();
                 }
                 using (var client = new HttpClient())
                 {
-                    string data = JsonConvert.SerializeObject(produto);
-                    StringContent conteudo = new StringContent(data, Encoding.UTF8, "application/json");
                     client.BaseAddress = new Uri(endpoint);
-                    HttpResponseMessage response = await client.PutAsJsonAsync(endpoint + "/" + produto.Id, conteudo);
-                    if (response.IsSuccessStatusCode)
+                    var putTask = client.PutAsJsonAsync<ProdutoViewModel>(endpoint + "/" + produto.Id, produto);
+                    putTask.Wait();
+                    var result = await putTask;
+                    if (result.IsSuccessStatusCode)
                     {
                         return RedirectToAction("Index");
                     }

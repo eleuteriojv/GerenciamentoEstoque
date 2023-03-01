@@ -74,7 +74,7 @@ namespace GerenciamentoEstoque.Web.Controllers
             return View(lojas);
         }
         [HttpGet]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
             try
             {
@@ -82,49 +82,44 @@ namespace GerenciamentoEstoque.Web.Controllers
                 {
                     return BadRequest();
                 }
-
+                LojaViewModel loja = null;
                 using (var client = new HttpClient())
                 {
-                    client.BaseAddress = new Uri(endpointLoja);
 
-                    // Obtém o produto pelo id
-                    var response = await client.GetAsync("?id=" + id.ToString());
-                    if (response.IsSuccessStatusCode)
+                    client.BaseAddress = new Uri(endpointLoja);
+                    var readTask = client.GetAsync(endpointLoja + "/" + id);
+                    readTask.Wait();
+                    var result = await readTask;
+                    if (result.IsSuccessStatusCode)
                     {
-                        var json = await response.Content.ReadAsStringAsync();
-                        var loja = JsonConvert.DeserializeObject<LojaViewModel[]>(json);
-                        var lojas = loja.Where(x => x.Id == id).FirstOrDefault();
-                        return View(lojas);
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(null, "Erro ao processar a solicitação");
+                        string conteudo = await result.Content.ReadAsStringAsync();
+                        loja = JsonConvert.DeserializeObject<LojaViewModel>(conteudo);
+                        return View(loja);
                     }
                 }
-
-                return NotFound();
             }
             catch
             {
                 return NotFound();
             }
+            return View();
         }
         [HttpPost]
         public async Task<IActionResult> Edit(int id, LojaViewModel loja)
         {
             try
             {
-                if (id != loja.Id)
+                if (loja == null)
                 {
                     return BadRequest();
                 }
                 using (var client = new HttpClient())
                 {
-                    string data = JsonConvert.SerializeObject(loja);
-                    StringContent conteudo = new StringContent(data, Encoding.UTF8, "application/json");
                     client.BaseAddress = new Uri(endpointLoja);
-                    HttpResponseMessage response = await client.PostAsync(client.BaseAddress + "/" + loja.Id, conteudo);
-                    if (response.IsSuccessStatusCode)
+                    var postTask = client.PutAsJsonAsync<LojaViewModel>(endpointLoja + "/" + loja.Id, loja);
+                    postTask.Wait();
+                    var result = await postTask;
+                    if (result.IsSuccessStatusCode)
                     {
                         return RedirectToAction("Index");
                     }

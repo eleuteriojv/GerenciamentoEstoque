@@ -44,7 +44,7 @@ namespace GerenciamentoEstoque.Api.Controllers
             return CreatedAtAction(nameof(Get), new { id = loja.Id }, loja);
         }
 
-        [HttpPost("{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, Loja loja)
         {
             if (id != loja.Id)
