@@ -7,9 +7,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{EAE327A1-32B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WEB", "WEB", "{E775A581-37E2-4735-B1FF-532342C9DE1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GerenciamentoEstoque.Api", "GerenciamentoEstoque.Api\GerenciamentoEstoque.Api.csproj", "{6430C988-3ED8-47DA-9F70-9244A2FD8333}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GerenciamentoEstoque.Api", "GerenciamentoEstoque.Api\GerenciamentoEstoque.Api.csproj", "{6430C988-3ED8-47DA-9F70-9244A2FD8333}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GerenciamentoEstoque.Web", "GerenciamentoEstoque.Web\GerenciamentoEstoque.Web.csproj", "{BD6415B0-E32A-481B-963F-BCAB02B18863}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GerenciamentoEstoque.Web", "GerenciamentoEstoque.Web\GerenciamentoEstoque.Web.csproj", "{BD6415B0-E32A-481B-963F-BCAB02B18863}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

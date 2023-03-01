@@ -9,6 +9,8 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using GerenciamentoEstoque.Web.ViewModels;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace GerenciamentoEstoque.Web.Controllers
 {

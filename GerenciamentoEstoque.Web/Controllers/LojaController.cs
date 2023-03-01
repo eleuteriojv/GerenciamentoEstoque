@@ -8,6 +8,8 @@ using System;
 using GerenciamentoEstoque.Web.ViewModels;
 using System.Linq;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace GerenciamentoEstoque.Web.Controllers
 {

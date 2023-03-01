@@ -6,16 +6,15 @@ using System.Threading.Tasks;
 
 namespace GerenciamentoEstoque.Api.Controllers
 {
-    [Route("v1/account")]
+    [Route("api/account")]
     public class AccountController : ControllerBase
     {
-
         [HttpPost]
         [Route("login")]
-        public async Task<ActionResult<dynamic>> Authenticate([FromBody] Login model)
+        public async Task<ActionResult<dynamic>> Authenticate([FromBody] Login login)
         {
             // Recupera o usuário
-            var user = UserRepository.Get(model.UserName, model.Password);
+            var user = UserRepository.Get(login.UserName, login.Password);
 
             // Verifica se o usuário existe
             if (user == null)
@@ -29,8 +28,8 @@ namespace GerenciamentoEstoque.Api.Controllers
             // Retorna os dados
             return new
             {
-                user = user,
-                token = token
+                User = user,
+                token = token,
             };
         }
     }

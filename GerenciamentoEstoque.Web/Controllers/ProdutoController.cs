@@ -7,9 +7,12 @@ using System.Threading.Tasks;
 using System;
 using GerenciamentoEstoque.Web.ViewModels;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace GerenciamentoEstoque.Web.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ProdutoController : Controller
     {
         private readonly string endpoint = "https://localhost:44344/api/produto";
