@@ -1,0 +1,30 @@
+﻿@model GerenciamentoEstoque.Web.ViewModels.LojaViewModel
+
+@{
+    ViewData["Title"] = "Remover Loja";
+}
+<div>
+    <h3>Remover Loja</h3>
+    <hr />
+    <h4>Você tem certeza que deseja remover?</h4>
+    <br />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Nome):
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Nome)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Endereco):
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Endereco)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="button" class="btn btn-danger" value="Voltar" onclick="history.back()">
+        <input type="submit" value="Remover" class="btn btn-success" />
+    </form>
+</div>

@@ -1,0 +1,67 @@
+﻿@model IEnumerable<GerenciamentoEstoque.Web.ViewModels.LojaViewModel>
+
+@{
+    ViewData["Title"] = "Lista de Lojas";
+}
+
+<h3 class="text-center">Lista de Lojas</h3>
+<hr />
+<p class="text-center">
+    <a class="btn btn-success" asp-action="Create">Adicionar uma Loja</a>
+</p>
+<table id="table" class="table table-bordered">
+    <thead class="thead-light">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Nome)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Endereco)
+            </th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nome)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Endereco)
+                </td>
+                <td>
+                    <a class="btn btn-success" asp-action="Edit" asp-route-id="@item.Id">Editar</a>
+                    <a class="btn btn-warning" asp-action="Details" asp-route-id="@item.Id">Detalhes</a>
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Remover</a>
+                    <a class="btn btn-primary" asp-action="ItemLoja" asp-route-id="@item.Id">Produtos da Loja</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#table').DataTable({
+                "oLanguage": {
+                    "sSearch": "",
+                    "sSearchPlaceholder": "Pesquisar..."
+                },
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Portuguese-Brasil.json',
+                }
+            });
+        });
+    </script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.15/css/dataTables.jqueryui.min.css" />
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/dataTables.jqueryui.min.js"></script>
+}
