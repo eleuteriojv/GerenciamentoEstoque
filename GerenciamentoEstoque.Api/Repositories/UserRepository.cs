@@ -10,7 +10,7 @@ namespace GerenciamentoEstoque.Api.Repositories
         {
             var users = new List<Login>();
             users.Add(new Login { Id = 1, UserName = "admin", Password = "admin", Role = "admin" });
-            return users.Where(x => x.UserName.ToLower() == username.ToLower() && x.Password == x.Password).FirstOrDefault();
+            return users.Where(x => x.UserName.ToLower() == username && x.Password == password).FirstOrDefault();
         }
     }
 }

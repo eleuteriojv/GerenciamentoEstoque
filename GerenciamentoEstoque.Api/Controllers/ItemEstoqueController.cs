@@ -108,7 +108,10 @@ namespace GerenciamentoEstoque.Api.Controllers
         {
             try
             {
-                var item = _context.ItemEstoques.Include(x => x.Lojas).Include(x => x.Produtos).Where(y => y.LojaId == id).ToList();
+                var item = _context.ItemEstoques
+                    .Include(x => x.Lojas)
+                    .Include(x => x.Produtos)
+                    .Where(y => y.LojaId == id).ToList();
                 return Ok(item);
             }
             catch (Exception)

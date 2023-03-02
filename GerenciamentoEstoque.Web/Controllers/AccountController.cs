@@ -21,7 +21,6 @@ namespace GerenciamentoEstoque.Web.Controllers
         [HttpGet]
         public IActionResult Authenticate()
         {
-
             return View();
         }
         [HttpPost]
@@ -50,6 +49,7 @@ namespace GerenciamentoEstoque.Web.Controllers
             {
                 return NotFound();
             }
+            TempData["Msg"] = "Usuário ou senha está incorreta";
             return View(login);
         }
     }

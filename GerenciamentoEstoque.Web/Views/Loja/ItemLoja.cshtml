@@ -39,9 +39,9 @@
                     @Html.DisplayFor(modelItem => item.Produtos.Preco)
                 </td>
                 <td>
-                    <a class="btn btn-success" asp-action="Edit" asp-controller="Produto" asp-route-id="@item.ProdutoId">Editar</a>
-                    <a class="btn btn-warning" asp-action="Details" asp-controller="Produto" asp-route-id="@item.ProdutoId">Detalhes</a>
-                    <a class="btn btn-danger" asp-action="Delete" asp-controller="Produto" asp-route-id="@item.ProdutoId">Remover</a>
+                    <a class="btn btn-success" asp-action="Edit" asp-controller="ItemEstoque" asp-route-idProduto="@item.ProdutoId" asp-route-idLoja="@item.LojaId">Editar</a>
+                    <a class="btn btn-warning" asp-action="Details" asp-controller="ItemEstoque" asp-route-idProduto="@item.ProdutoId" asp-route-idLoja="@item.LojaId">Detalhes</a>
+                    <a class="btn btn-danger" asp-action="Delete" asp-controller="ItemEstoque" asp-route-idProduto="@item.ProdutoId" asp-route-idLoja="@item.LojaId">Remover</a>
                 </td>
             </tr>
         }

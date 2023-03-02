@@ -13,6 +13,10 @@
                     </h1>
                 </div>
                 <hr />
+                @if (TempData["Msg"] != null)
+                {
+                    <p class="text-danger">@TempData["Msg"]</p>
+                }
                 <div class="form-group">
                     <label asp-for="UserName"></label>
                     <input asp-for="UserName" class="form-control" />
@@ -22,7 +26,7 @@
                     <label asp-for="Password"></label>
                     <input asp-for="Password" class="form-control" type="password">
                     <span asp-validation-for="Password" class="text-danger"></span>
-                </div>  
+                </div>
                 <div class="form-group" hidden>
                     <label asp-for="Role"></label>
                     <select asp-for="Role" class="form-control">

@@ -14,7 +14,7 @@ namespace GerenciamentoEstoque.Web.Controllers
     public class LojaController : Controller
     {
         private readonly string _endpointLoja = "https://localhost:44344/api/loja";
-        private readonly string _endpointEstoque = "https://localhost:44344/api/itemEstoque/itemLoja";
+        private readonly string _endpointEstoque = "https://localhost:44344/itemloja";
         private readonly HttpClient _httpClient;
         private readonly ITokenService _tokenService;
         public LojaController(ITokenService tokenService)
@@ -209,25 +209,22 @@ namespace GerenciamentoEstoque.Web.Controllers
                 if (id == 0)
                 {
                     return BadRequest();
-
                 }
-                List<ItemEstoqueViewModel> estoque = new List<ItemEstoqueViewModel>();
-                _httpClient.BaseAddress = new Uri(_endpointEstoque);
                 var authToken = _tokenService.GetTokenFromRequest(Request);
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                List<ItemEstoqueViewModel> item = new List<ItemEstoqueViewModel>();
+                _httpClient.BaseAddress = new Uri(_endpointEstoque);
                 var result = await _httpClient.GetAsync(_endpointEstoque + "/" + id);
                 if (result.IsSuccessStatusCode)
                 {
                     string conteudo = await result.Content.ReadAsStringAsync();
-                    estoque = JsonConvert.DeserializeObject<List<ItemEstoqueViewModel>>(conteudo);
-                    return View(estoque);
+                    item = JsonConvert.DeserializeObject<List<ItemEstoqueViewModel>>(conteudo);
+                    return View(item);
                 }
             }
-
-            catch (Exception)
+            catch
             {
-
-                throw;
+                return StatusCode(401, "Você não está autorizado");
             }
             return View();
         }

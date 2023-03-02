@@ -88,12 +88,19 @@ namespace GerenciamentoEstoque.Web.Controllers
         {
             try
             {
+                var verificaItem = VerificaItemEstoque(itemEstoque);
+
                 if (itemEstoque == null)
                 {
                     return BadRequest();
                 }
-                var authToken = _tokenService.GetTokenFromRequest(Request);
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                ViewBag.Lojas = await GetLojas();
+                ViewBag.Produtos = await GetProdutos();
+                if (verificaItem.Result)
+                {
+                    TempData["Msg"] = "A loja já possui esse produto no estoque, não é necessário cadastrar.";
+                    return View(itemEstoque);
+                }
                 _httpClient.BaseAddress = new Uri(_endpoint);
                 var result = await _httpClient.PostAsJsonAsync<ItemEstoqueViewModel>("itemEstoque", itemEstoque);
                 if (result.IsSuccessStatusCode)
@@ -103,10 +110,49 @@ namespace GerenciamentoEstoque.Web.Controllers
             }
             catch
             {
-                return StatusCode(401, "Você não está autorizado");
+                return NotFound();
             }
-            TempData["Mensagem"] = "Esse item já está na loja que você escolheu";
-            return View();
+            return View(itemEstoque);
+        }
+        private async Task<IList<SelectListItem>> GetLojas()
+        {
+            List<LojaViewModel> estoques = new List<LojaViewModel>();
+            var authToken = _tokenService.GetTokenFromRequest(Request);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+            HttpResponseMessage response = await _httpClient.GetAsync(_endpointLoja);
+            if (response.IsSuccessStatusCode)
+            {
+                string conteudo = await response.Content.ReadAsStringAsync();
+                estoques = JsonConvert.DeserializeObject<List<LojaViewModel>>(conteudo);
+                var select = estoques.Select(e => new SelectListItem { Text = e.Nome, Value = e.Id.ToString() }).ToList();
+                return select;
+            }
+            return null;
+        }
+        private async Task<IList<SelectListItem>> GetProdutos()
+        {
+            List<ProdutoViewModel> produtos = new List<ProdutoViewModel>();
+            var authToken = _tokenService.GetTokenFromRequest(Request);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+            HttpResponseMessage responses = await _httpClient.GetAsync(_endpointProduto);
+            if (responses.IsSuccessStatusCode)
+            {
+                string conteudo = await responses.Content.ReadAsStringAsync();
+                produtos = JsonConvert.DeserializeObject<List<ProdutoViewModel>>(conteudo);
+                var select = produtos.Select(e => new SelectListItem { Text = e.Nome, Value = e.Id.ToString() }).ToList();
+                return select;
+            }
+            return null;
+        }
+        public async Task<bool> VerificaItemEstoque(ItemEstoqueViewModel itemEstoque)
+        {
+            var authToken = _tokenService.GetTokenFromRequest(Request);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+            _httpClient.BaseAddress = new Uri(_endpoint);
+            var result = await _httpClient.GetAsync(_endpoint + "/" + itemEstoque.ProdutoId + "/" + itemEstoque.LojaId);
+            if (result.IsSuccessStatusCode)
+                return true;
+            return false;
         }
         [HttpGet]
         public async Task<IActionResult> Edit(int idProduto, int idLoja)
