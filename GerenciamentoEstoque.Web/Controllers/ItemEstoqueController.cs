@@ -88,6 +88,9 @@ namespace GerenciamentoEstoque.Web.Controllers
         {
             try
             {
+                var authToken = _tokenService.GetTokenFromRequest(Request);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                _httpClient.BaseAddress = new Uri(_endpoint);
                 var verificaItem = VerificaItemEstoque(itemEstoque);
 
                 if (itemEstoque == null)
@@ -101,7 +104,7 @@ namespace GerenciamentoEstoque.Web.Controllers
                     TempData["Msg"] = "A loja já possui esse produto no estoque, não é necessário cadastrar.";
                     return View(itemEstoque);
                 }
-                _httpClient.BaseAddress = new Uri(_endpoint);
+
                 var result = await _httpClient.PostAsJsonAsync<ItemEstoqueViewModel>("itemEstoque", itemEstoque);
                 if (result.IsSuccessStatusCode)
                 {

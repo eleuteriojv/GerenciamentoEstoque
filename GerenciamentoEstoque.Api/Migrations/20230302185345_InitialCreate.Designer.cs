@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GerenciamentoEstoque.Api.Migrations
 {
     [DbContext(typeof(GerenciamentoDbContext))]
-    [Migration("20230301192223_AtualizandoBanco")]
-    partial class AtualizandoBanco
+    [Migration("20230302185345_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
