@@ -1,6 +1,7 @@
-﻿using GerenciamentoEstoque.Web.ViewModels;
+﻿using GerenciamentoEstoque.Web.Models;
+using GerenciamentoEstoque.Web.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using System;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -29,19 +30,20 @@ namespace GerenciamentoEstoque.Web.Controllers
             try
             {
                 if (login == null)
-                {
                     return BadRequest();
-                }
-                using (var client = new HttpClient())
+                using var client = new HttpClient();
+                client.BaseAddress = new Uri(endpoint);
+                var result = await client.PostAsJsonAsync("Login", login);
+                if (result.IsSuccessStatusCode)
                 {
-                    client.BaseAddress = new Uri(endpoint);
-                    var postTask = client.PostAsJsonAsync<LoginViewModel>("Login", login);
-                    postTask.Wait();
-                    var result = await postTask;
-                    if (result.IsSuccessStatusCode)
+                    var loginResult = await result.Content.ReadFromJsonAsync<AuthenticationResult>();
+                    var cookieOptions = new CookieOptions
                     {
-                        return RedirectToAction("Index", "Home");
-                    }
+                        Expires = DateTime.Now.AddMonths(1),
+                        Path = "/"
+                    };
+                    Response.Cookies.Append("token", loginResult.Token, cookieOptions);
+                    return RedirectToAction("Index", "Home");
                 }
             }
             catch

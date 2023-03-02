@@ -9,18 +9,20 @@ using GerenciamentoEstoque.Web.ViewModels;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using GerenciamentoEstoque.Web.Services.Interfaces;
+using System.Net.Http.Headers;
 
 namespace GerenciamentoEstoque.Web.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ProdutoController : Controller
     {
         private readonly string endpoint = "https://localhost:44344/api/produto";
-        private readonly HttpClient httpClient = null;
-        public ProdutoController()
+        private readonly HttpClient _httpClient;
+        private readonly ITokenService _tokenService;
+        public ProdutoController(ITokenService tokenService)
         {
-            httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri(endpoint);
+            _httpClient = new HttpClient();
+            _tokenService = tokenService;
         }
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -28,7 +30,9 @@ namespace GerenciamentoEstoque.Web.Controllers
             try
             {
                 List<ProdutoViewModel> produtos = new List<ProdutoViewModel>();
-                HttpResponseMessage response = await httpClient.GetAsync(endpoint);
+                var authToken = _tokenService.GetTokenFromRequest(Request);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
                 if (response.IsSuccessStatusCode)
                 {
                     string conteudo = await response.Content.ReadAsStringAsync();
@@ -38,12 +42,15 @@ namespace GerenciamentoEstoque.Web.Controllers
             }
             catch
             {
-                return NotFound();
+                return StatusCode(401, "Você não está autorizado");
+
             }
         }
         [HttpGet]
         public IActionResult Create()
         {
+            var authToken = _tokenService.GetTokenFromRequest(Request);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
             return View();
         }
         [HttpPost]
@@ -55,21 +62,18 @@ namespace GerenciamentoEstoque.Web.Controllers
                 {
                     return BadRequest();
                 }
-                using (var client = new HttpClient())
+                var authToken = _tokenService.GetTokenFromRequest(Request);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                _httpClient.BaseAddress = new Uri(endpoint);
+                var result = await _httpClient.PostAsJsonAsync<ProdutoViewModel>("Produto", produtos);
+                if (result.IsSuccessStatusCode)
                 {
-                    client.BaseAddress = new Uri(endpoint);
-                    var postTask = client.PostAsJsonAsync<ProdutoViewModel>("Produto", produtos);
-                    postTask.Wait();
-                    var result = await postTask;
-                    if (result.IsSuccessStatusCode)
-                    {
-                        return RedirectToAction("Index");
-                    }
+                    return RedirectToAction("Index");
                 }
             }
             catch
             {
-                return NotFound();
+                return StatusCode(401, "Você não está autorizado");
             }
             return View(produtos);
         }
@@ -78,29 +82,25 @@ namespace GerenciamentoEstoque.Web.Controllers
         {
             try
             {
-                if (id == null)
+                if (id == 0)
                 {
                     return BadRequest();
                 }
+                var authToken = _tokenService.GetTokenFromRequest(Request);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
                 ProdutoViewModel produto = null;
-                using (var client = new HttpClient())
+                _httpClient.BaseAddress = new Uri(endpoint);
+                var result = await _httpClient.GetAsync(endpoint + "/" + id);
+                if (result.IsSuccessStatusCode)
                 {
-
-                    client.BaseAddress = new Uri(endpoint);
-                    var readTask = client.GetAsync(endpoint + "/" + id);
-                    readTask.Wait();
-                    var result = await readTask;
-                    if (result.IsSuccessStatusCode)
-                    {
-                        string conteudo = await result.Content.ReadAsStringAsync();
-                        produto = JsonConvert.DeserializeObject<ProdutoViewModel>(conteudo);
-                        return View(produto);
-                    }
+                    string conteudo = await result.Content.ReadAsStringAsync();
+                    produto = JsonConvert.DeserializeObject<ProdutoViewModel>(conteudo);
+                    return View(produto);
                 }
             }
             catch
             {
-                return NotFound();
+                return StatusCode(401, "Você não está autorizado");
             }
             return View();
         }
@@ -113,21 +113,18 @@ namespace GerenciamentoEstoque.Web.Controllers
                 {
                     return BadRequest();
                 }
-                using (var client = new HttpClient())
+                var authToken = _tokenService.GetTokenFromRequest(Request);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                _httpClient.BaseAddress = new Uri(endpoint);
+                var result = await _httpClient.PutAsJsonAsync<ProdutoViewModel>(endpoint + "/" + produto.Id, produto);
+                if (result.IsSuccessStatusCode)
                 {
-                    client.BaseAddress = new Uri(endpoint);
-                    var putTask = client.PutAsJsonAsync<ProdutoViewModel>(endpoint + "/" + produto.Id, produto);
-                    putTask.Wait();
-                    var result = await putTask;
-                    if (result.IsSuccessStatusCode)
-                    {
-                        return RedirectToAction("Index");
-                    }
+                    return RedirectToAction("Index");
                 }
             }
             catch
             {
-                return NotFound();
+                return StatusCode(401, "Você não está autorizado");
             }
             return View(produto);
         }
@@ -141,24 +138,20 @@ namespace GerenciamentoEstoque.Web.Controllers
                     return BadRequest();
                 }
                 ProdutoViewModel produto = null;
-                using (var client = new HttpClient())
+                var authToken = _tokenService.GetTokenFromRequest(Request);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                _httpClient.BaseAddress = new Uri(endpoint);
+                var result = await _httpClient.GetAsync(endpoint + "/" + id);
+                if (result.IsSuccessStatusCode)
                 {
-
-                    client.BaseAddress = new Uri(endpoint);
-                    var deleteTask = client.GetAsync(endpoint + "/" + id);
-                    deleteTask.Wait();
-                    var result = await deleteTask;
-                    if (result.IsSuccessStatusCode)
-                    {
-                        string conteudo = await result.Content.ReadAsStringAsync();
-                        produto = JsonConvert.DeserializeObject<ProdutoViewModel>(conteudo);
-                        return View(produto);
-                    }
+                    string conteudo = await result.Content.ReadAsStringAsync();
+                    produto = JsonConvert.DeserializeObject<ProdutoViewModel>(conteudo);
+                    return View(produto);
                 }
             }
             catch
             {
-                return NotFound();
+                return StatusCode(401, "Você não está autorizado");
             }
             return View();
         }
@@ -167,25 +160,22 @@ namespace GerenciamentoEstoque.Web.Controllers
         {
             try
             {
-                if (produto.Id == null)
+                if (produto.Id == 0)
                 {
                     return BadRequest();
                 }
-                using (var client = new HttpClient())
+                var authToken = _tokenService.GetTokenFromRequest(Request);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                _httpClient.BaseAddress = new Uri(endpoint);
+                var result = await _httpClient.DeleteAsync(endpoint + "/" + produto.Id);
+                if (result.IsSuccessStatusCode)
                 {
-                    client.BaseAddress = new Uri(endpoint);
-                    var deleteTask = client.DeleteAsync(endpoint + "/" + produto.Id);
-                    deleteTask.Wait();
-                    var result = await deleteTask;
-                    if (result.IsSuccessStatusCode)
-                    {
-                        return RedirectToAction("Index");
-                    }
+                    return RedirectToAction("Index");
                 }
             }
             catch
             {
-                return NotFound();
+                return StatusCode(401, "Você não está autorizado");
             }
             return View();
         }
@@ -199,24 +189,20 @@ namespace GerenciamentoEstoque.Web.Controllers
                     return BadRequest();
                 }
                 ProdutoViewModel produto = new ProdutoViewModel();
-                using (var client = new HttpClient())
+                var authToken = _tokenService.GetTokenFromRequest(Request);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                _httpClient.BaseAddress = new Uri(endpoint);
+                var result = await _httpClient.GetAsync(endpoint + "/" + id);
+                if (result.IsSuccessStatusCode)
                 {
-                    client.BaseAddress = new Uri(endpoint);
-                    var detailsTask = client.GetAsync(endpoint + "/" + id);
-                    detailsTask.Wait();
-                    var result = await detailsTask;
-                    if (result.IsSuccessStatusCode)
-                    {
-                        string conteudo = await result.Content.ReadAsStringAsync();
-                        produto = JsonConvert.DeserializeObject<ProdutoViewModel>(conteudo);
-                        return View(produto);
-                    }
-
+                    string conteudo = await result.Content.ReadAsStringAsync();
+                    produto = JsonConvert.DeserializeObject<ProdutoViewModel>(conteudo);
+                    return View(produto);
                 }
             }
             catch
             {
-                return NotFound();
+                return StatusCode(401, "Você não está autorizado");
             }
             return View();
         }

@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System;
-using GerenciamentoEstoque.Api.Data;
+﻿using GerenciamentoEstoque.Api.Data;
 using GerenciamentoEstoque.Api.Models;
 using Microsoft.AspNetCore.Authorization;
-using System.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GerenciamentoEstoque.Api.Controllers
 {
@@ -23,18 +22,33 @@ namespace GerenciamentoEstoque.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Produto>>> Get()
         {
-            return await _context.Produtos.Include(x => x.Estoques).ToListAsync();
+            try
+            {
+                return await _context.Produtos.Include(x => x.Estoques).ToListAsync();
+            }
+            catch (Exception)
+            {
+                return StatusCode(401, "Você não está autorizado");
+            }
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<Produto>> Get(int id)
         {
-            var produto = await _context.Produtos.FindAsync(id);
-
-            if (produto == null)
+            try
             {
-                return NotFound();
+                var produto = await _context.Produtos.FindAsync(id);
+
+                if (produto == null)
+                {
+                    return NotFound();
+                }
+                return produto;
             }
-            return produto;
+            catch (Exception)
+            {
+                return StatusCode(401, "Você não está autorizado");
+            }
+            
         }
         [HttpPost]
         public async Task<ActionResult<Produto>> Post(Produto produto)
@@ -46,9 +60,9 @@ namespace GerenciamentoEstoque.Api.Controllers
 
                 return CreatedAtAction(nameof(Get), new { id = produto.Id }, produto);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                return StatusCode(500, "Ocorreu um erro ao cadastrar produtos.");
             }
 
         }

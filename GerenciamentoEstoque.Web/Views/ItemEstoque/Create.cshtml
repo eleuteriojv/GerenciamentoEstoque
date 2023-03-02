@@ -3,46 +3,35 @@
 @{
     ViewData["Title"] = "Cadastrar Item";
 }
-
-<h1>Cadastrar Item no Estoque</h1>
+<br />
+<h3>Cadastrar Item no Estoque</h3>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @if (ViewBag.Produtos.Count == 0)
-            {
-                <p class="text-danger">*Todos os produtos estão associados a uma loja com seu respectivo estoque, clique em "Novo Produto" para cadastrar e associar a uma loja.</p>
-                <div class="form-group">
-                    <a class="btn btn-danger" asp-action="Index">Voltar</a>
-                    <a class="btn btn-primary" asp-action="Create" asp-controller="Produto">Novo Produto</a>
-                </div>
-            }
-            else
-            {
-                <div class="form-group">
-                    <label asp-for="Quantidade" class="control-label"></label>
-                    <input asp-for="Quantidade" class="form-control" />
-                    <span asp-validation-for="Quantidade" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Lojas.Nome" class="control-label"></label>
-                    <select asp-for="LojaId" class="form-control" asp-items="ViewBag.Lojas"></select>
-                    <span asp-validation-for="Lojas.Nome" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Produtos.Nome" class="control-label"></label>
-                    <select asp-for="ProdutoId" class="form-control" asp-items="ViewBag.Produtos">
-                    </select>
-                    <span asp-validation-for="Produtos.Nome" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <a class="btn btn-danger" asp-action="Index">Voltar</a>
-                    <a class="btn btn-primary" asp-action="Create" asp-controller="Produto">Novo Produto</a>
-                    <input type="submit" value="Cadastrar" class="btn btn-success" />
-                </div>
-            }
+            <div class="form-group">
+                <label asp-for="Quantidade" class="control-label"></label>
+                <input asp-for="Quantidade" class="form-control" />
+                <span asp-validation-for="Quantidade" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Lojas.Nome" class="control-label"></label>
+                <select asp-for="LojaId" class="form-control" asp-items="ViewBag.Lojas"></select>
+                <span asp-validation-for="Lojas.Nome" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Produtos.Nome" class="control-label"></label>
+                <select asp-for="ProdutoId" class="form-control" asp-items="ViewBag.Produtos">
+                </select>
+                <span asp-validation-for="Produtos.Nome" class="text-danger"></span>
+            </div>
+            <hr />
+            <div class="form-group">
+                <a class="btn btn-danger" asp-action="Index">Voltar</a>
+                <a class="btn btn-primary" asp-action="Create" asp-controller="Produto">Novo Produto</a>
+                <input type="submit" value="Cadastrar" class="btn btn-success" />
+            </div>
         </form>
     </div>
 </div>

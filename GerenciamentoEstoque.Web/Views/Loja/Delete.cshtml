@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Remover Loja";
 }
+<br />
 <div>
     <h3>Remover Loja</h3>
     <hr />
@@ -22,7 +23,7 @@
             @Html.DisplayFor(model => model.Endereco)
         </dd>
     </dl>
-
+    <hr />
     <form asp-action="Delete">
         <input type="button" class="btn btn-danger" value="Voltar" onclick="history.back()">
         <input type="submit" value="Remover" class="btn btn-success" />

@@ -14,7 +14,7 @@ namespace GerenciamentoEstoque.Api.Services
         public static string GenerateToken(Login login)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(Settings.Settings.Secret);
+            var key = Encoding.ASCII.GetBytes(Settings.Key.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]

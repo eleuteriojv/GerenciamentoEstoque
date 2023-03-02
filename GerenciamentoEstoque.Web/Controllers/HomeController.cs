@@ -1,21 +1,23 @@
 ﻿using GerenciamentoEstoque.Web.Models;
+using GerenciamentoEstoque.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace GerenciamentoEstoque.Web.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly HttpClient _httpClient;
+        private readonly ITokenService _tokenService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ITokenService tokenService)
         {
             _logger = logger;
+            _tokenService = tokenService;
+            _httpClient = new HttpClient();
         }
 
         public IActionResult Index()

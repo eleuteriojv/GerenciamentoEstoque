@@ -3,10 +3,11 @@
 @{
     ViewData["Title"] = "ItemLoja";
 }
-
+<br />
 <h1 class="text-center">Produtos da Loja </h1>
 <hr />
 <p class="text-center">
+    <a class="btn btn-danger" asp-action="Index" asp-controller="Home">Voltar para a Tela Principal</a>
     <a class="btn btn-success" asp-action="Create" asp-controller="ItemEstoque">Adicionar um Produto</a>
 </p>
 <table id="table" class="table">
@@ -35,10 +36,9 @@
                     @Html.DisplayFor(modelItem => item.Produtos.Nome)
                 </td>
                 <td>
-                    R$ @Html.DisplayFor(modelItem => item.Produtos.Preco)
+                    @Html.DisplayFor(modelItem => item.Produtos.Preco)
                 </td>
                 <td>
-
                     <a class="btn btn-success" asp-action="Edit" asp-controller="Produto" asp-route-id="@item.ProdutoId">Editar</a>
                     <a class="btn btn-warning" asp-action="Details" asp-controller="Produto" asp-route-id="@item.ProdutoId">Detalhes</a>
                     <a class="btn btn-danger" asp-action="Delete" asp-controller="Produto" asp-route-id="@item.ProdutoId">Remover</a>

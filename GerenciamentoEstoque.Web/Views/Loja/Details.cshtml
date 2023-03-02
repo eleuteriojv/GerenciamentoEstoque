@@ -3,8 +3,8 @@
 @{
     ViewData["Title"] = "Detalhes";
 }
-
-<h1>Detalhes</h1>
+<br />
+<h3>Detalhes</h3>
 <div>
     <hr />
     <dl class="row">
@@ -22,6 +22,7 @@
         </dd>
     </dl>
 </div>
+<hr />
 <div>
     <input type="button" class="btn btn-danger" value="Voltar" onclick="history.back()">
     <a class="btn btn-success" asp-action="Edit" asp-route-id="@Model.Id">Editar</a>

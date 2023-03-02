@@ -11,21 +11,24 @@ using GerenciamentoEstoque.Web.ViewModels;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using GerenciamentoEstoque.Web.Services.Interfaces;
+using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Runtime.Intrinsics.X86;
 
 namespace GerenciamentoEstoque.Web.Controllers
 {
     public class ItemEstoqueController : Controller
     {
-        private readonly string endpoint = "https://localhost:44344/api/itemestoque";
-        private readonly string endpointLoja = "https://localhost:44344/api/loja";
-        private readonly string endpointProduto = "https://localhost:44344/api/produto";
-        private readonly HttpClient httpClient = null;
-        public ItemEstoqueController()
+        private readonly string _endpoint = "https://localhost:44344/api/itemestoque";
+        private readonly string _endpointLoja = "https://localhost:44344/api/loja";
+        private readonly string _endpointProduto = "https://localhost:44344/api/produto";
+        private readonly HttpClient _httpClient;
+        private readonly ITokenService _tokenService;
+        public ItemEstoqueController(ITokenService tokenService)
         {
-            httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri(endpoint);
-            httpClient.BaseAddress = new Uri(endpointLoja);
-            httpClient.BaseAddress = new Uri(endpointProduto);
+            _httpClient = new HttpClient();
+            _tokenService = tokenService;
         }
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -33,7 +36,9 @@ namespace GerenciamentoEstoque.Web.Controllers
             try
             {
                 List<ItemEstoqueViewModel> lojas = new List<ItemEstoqueViewModel>();
-                HttpResponseMessage response = await httpClient.GetAsync(endpoint);
+                var authToken = _tokenService.GetTokenFromRequest(Request);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                HttpResponseMessage response = await _httpClient.GetAsync(_endpoint);
                 if (response.IsSuccessStatusCode)
                 {
                     string conteudo = await response.Content.ReadAsStringAsync();
@@ -44,7 +49,7 @@ namespace GerenciamentoEstoque.Web.Controllers
             }
             catch (Exception)
             {
-                return NotFound();
+                return StatusCode(401, "Você não está autorizado");
             }
         }
         [HttpGet]
@@ -53,7 +58,9 @@ namespace GerenciamentoEstoque.Web.Controllers
             try
             {
                 List<LojaViewModel> estoques = new List<LojaViewModel>();
-                HttpResponseMessage response = await httpClient.GetAsync(endpointLoja);
+                var authToken = _tokenService.GetTokenFromRequest(Request);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                HttpResponseMessage response = await _httpClient.GetAsync(_endpointLoja);
                 if (response.IsSuccessStatusCode)
                 {
                     string conteudo = await response.Content.ReadAsStringAsync();
@@ -62,19 +69,17 @@ namespace GerenciamentoEstoque.Web.Controllers
                 }
 
                 List<ProdutoViewModel> produtos = new List<ProdutoViewModel>();
-                HttpResponseMessage responses = await httpClient.GetAsync(endpointProduto);
+                HttpResponseMessage responses = await _httpClient.GetAsync(_endpointProduto);
                 if (responses.IsSuccessStatusCode)
                 {
                     string conteudo = await responses.Content.ReadAsStringAsync();
                     produtos = JsonConvert.DeserializeObject<List<ProdutoViewModel>>(conteudo);
-                    ViewBag.Produtos = produtos.Where(x => x.Estoques.Count == 0).Select(e => new SelectListItem { Text = e.Nome, Value = e.Id.ToString() }).ToList();
+                    ViewBag.Produtos = produtos.Select(e => new SelectListItem { Text = e.Nome, Value = e.Id.ToString() }).ToList();
                 }
-                return View();
             }
             catch (Exception)
             {
-
-                throw;
+                return StatusCode(401, "Você não está autorizado");
             }
             return View();
         }
@@ -83,28 +88,25 @@ namespace GerenciamentoEstoque.Web.Controllers
         {
             try
             {
-
                 if (itemEstoque == null)
                 {
                     return BadRequest();
                 }
-                using (var client = new HttpClient())
+                var authToken = _tokenService.GetTokenFromRequest(Request);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                _httpClient.BaseAddress = new Uri(_endpoint);
+                var result = await _httpClient.PostAsJsonAsync<ItemEstoqueViewModel>("itemEstoque", itemEstoque);
+                if (result.IsSuccessStatusCode)
                 {
-                    client.BaseAddress = new Uri(endpoint);
-                    var postTask = client.PostAsJsonAsync<ItemEstoqueViewModel>("itemEstoque", itemEstoque);
-                    postTask.Wait();
-                    var result = await postTask;
-                    if (result.IsSuccessStatusCode)
-                    {
-                        return RedirectToAction("Index");
-                    }
+                    return RedirectToAction("Index");
                 }
             }
             catch
             {
-                return NotFound();
+                return StatusCode(401, "Você não está autorizado");
             }
-            return View(itemEstoque);
+            TempData["Mensagem"] = "Esse item já está na loja que você escolheu";
+            return View();
         }
         [HttpGet]
         public async Task<IActionResult> Edit(int idProduto, int idLoja)
@@ -117,42 +119,38 @@ namespace GerenciamentoEstoque.Web.Controllers
                 }
 
                 ItemEstoqueViewModel item = null;
-                using (var client = new HttpClient())
+                var authToken = _tokenService.GetTokenFromRequest(Request);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                _httpClient.BaseAddress = new Uri(_endpoint);
+                var result = await _httpClient.GetAsync(_endpoint + "/" + idProduto + "/" + idLoja);
+                if (result.IsSuccessStatusCode)
                 {
-
-                    client.BaseAddress = new Uri(endpoint);
-                    var readTask = client.GetAsync(endpoint + "/" + idProduto + "/" + idLoja);
-                    readTask.Wait();
-                    var result = await readTask;
-                    if (result.IsSuccessStatusCode)
-                    {
-                        string conteudo = await result.Content.ReadAsStringAsync();
-                        item = JsonConvert.DeserializeObject<ItemEstoqueViewModel>(conteudo);
-                        List<SelectListItem> produto = new List<SelectListItem>
+                    string conteudo = await result.Content.ReadAsStringAsync();
+                    item = JsonConvert.DeserializeObject<ItemEstoqueViewModel>(conteudo);
+                    List<SelectListItem> produto = new List<SelectListItem>
                         {
                             new SelectListItem
                             {
-                                Text = item.Produtos.Nome, 
+                                Text = item.Produtos.Nome,
                                 Value = item.Produtos.Id.ToString()
                             }
                         };
-                        List<SelectListItem> loja = new List<SelectListItem>
+                    List<SelectListItem> loja = new List<SelectListItem>
                         {
                             new SelectListItem
                             {
-                                Text = item.Lojas.Nome, 
+                                Text = item.Lojas.Nome,
                                 Value = item.Lojas.Id.ToString()
                             }
                         };
-                        ViewBag.Loja = loja;
-                        ViewBag.Produto = produto;
-                        return View(item);
-                    }
+                    ViewBag.Loja = loja;
+                    ViewBag.Produto = produto;
+                    return View(item);
                 }
             }
             catch
             {
-                return NotFound();
+                return StatusCode(401, "Você não está autorizado");
             }
             return View();
         }
@@ -165,23 +163,48 @@ namespace GerenciamentoEstoque.Web.Controllers
                 {
                     return BadRequest();
                 }
-                using (var client = new HttpClient())
+                var authToken = _tokenService.GetTokenFromRequest(Request);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                _httpClient.BaseAddress = new Uri(_endpoint);
+                var result = await _httpClient.PutAsJsonAsync<ItemEstoqueViewModel>(_endpoint + "/" + item.ProdutoId + item.LojaId, item);
+                if (result.IsSuccessStatusCode)
                 {
-                    client.BaseAddress = new Uri(endpoint);
-                    var putTask = client.PutAsJsonAsync<ItemEstoqueViewModel>(endpoint + "/" + item.ProdutoId + item.LojaId, item);
-                    putTask.Wait();
-                    var result = await putTask;
-                    if (result.IsSuccessStatusCode)
-                    {
-                        return RedirectToAction("Index");
-                    }
+                    return RedirectToAction("Index");
+                }
+
+            }
+            catch
+            {
+                return StatusCode(401, "Você não está autorizado");
+            }
+            return View(item);
+        }
+        [HttpGet]
+        public async Task<IActionResult> Details(int idProduto, int idLoja)
+        {
+            try
+            {
+                if (idProduto == 0 && idLoja == 0)
+                {
+                    return BadRequest();
+                }
+                var authToken = _tokenService.GetTokenFromRequest(Request);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                ItemEstoqueViewModel item = null;
+                _httpClient.BaseAddress = new Uri(_endpoint);
+                var result = await _httpClient.GetAsync(_endpoint + "/" + idProduto + "/" + idLoja);
+                if (result.IsSuccessStatusCode)
+                {
+                    string conteudo = await result.Content.ReadAsStringAsync();
+                    item = JsonConvert.DeserializeObject<ItemEstoqueViewModel>(conteudo);
+                    return View(item);
                 }
             }
             catch
             {
-                return NotFound();
+                return StatusCode(401, "Você não está autorizado");
             }
-            return View(item);
+            return View();
         }
         [HttpGet]
         public async Task<IActionResult> Delete(int idProduto, int idLoja)
@@ -192,26 +215,21 @@ namespace GerenciamentoEstoque.Web.Controllers
                 {
                     return BadRequest();
                 }
-
+                var authToken = _tokenService.GetTokenFromRequest(Request);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
                 ItemEstoqueViewModel item = null;
-                using (var client = new HttpClient())
+                _httpClient.BaseAddress = new Uri(_endpoint);
+                var result = await _httpClient.GetAsync(_endpoint + "/" + idProduto + "/" + idLoja);
+                if (result.IsSuccessStatusCode)
                 {
-
-                    client.BaseAddress = new Uri(endpoint);
-                    var readTask = client.GetAsync(endpoint + "/" + idProduto + "/" + idLoja);
-                    readTask.Wait();
-                    var result = await readTask;
-                    if (result.IsSuccessStatusCode)
-                    {
-                        string conteudo = await result.Content.ReadAsStringAsync();
-                        item = JsonConvert.DeserializeObject<ItemEstoqueViewModel>(conteudo);
-                        return View(item);
-                    }
+                    string conteudo = await result.Content.ReadAsStringAsync();
+                    item = JsonConvert.DeserializeObject<ItemEstoqueViewModel>(conteudo);
+                    return View(item);
                 }
             }
             catch
             {
-                return NotFound();
+                return StatusCode(401, "Você não está autorizado");
             }
             return View();
         }
@@ -225,24 +243,21 @@ namespace GerenciamentoEstoque.Web.Controllers
                 {
                     return BadRequest();
                 }
-                using (var client = new HttpClient())
+                var authToken = _tokenService.GetTokenFromRequest(Request);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                _httpClient.BaseAddress = new Uri(_endpoint);
+                var result = await _httpClient.DeleteAsync(_endpoint + "/" + item.ProdutoId + "/" + item.LojaId);
+                if (result.IsSuccessStatusCode)
                 {
-                    client.BaseAddress = new Uri(endpoint);
-                    var deleteTask = client.DeleteAsync(endpoint + "/" + item.ProdutoId + "/" + item.LojaId);
-                    deleteTask.Wait();
-                    var result = await deleteTask;
-                    if (result.IsSuccessStatusCode)
-                    {
-                        return RedirectToAction("Index");
-                    }
+                    return RedirectToAction("Index");
                 }
             }
             catch
             {
-                return NotFound();
+                return StatusCode(401, "Você não está autorizado");
             }
             return View();
         }
-        
+
     }
 }

@@ -1,18 +1,14 @@
-using GerenciamentoEstoque.Web.Controllers;
+using GerenciamentoEstoque.Web.Services;
+using GerenciamentoEstoque.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace GerenciamentoEstoque.Web
 {
@@ -51,7 +47,7 @@ namespace GerenciamentoEstoque.Web
                     ValidateAudience = false
                 };
             });
-
+            services.AddTransient<ITokenService, TokenService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -29,9 +29,9 @@ namespace GerenciamentoEstoque.Api.Controllers
                 var itemEstoque = _context.ItemEstoques.Include(x => x.Lojas).Include(x => x.Produtos).AsNoTracking().AsAsyncEnumerable();
                 return Ok(itemEstoque);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, "Ocorreu um erro ao buscar os livros.");
+                return StatusCode(500, "Ocorreu um erro ao buscar itens no estoque.");
             }
         }
 
@@ -80,7 +80,7 @@ namespace GerenciamentoEstoque.Api.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "Ocorreu um erro ao buscar os livros.");
+                return StatusCode(500, "Ocorreu um erro ao atualizar item no estoque.");
             }
 
             return NoContent();
@@ -103,7 +103,7 @@ namespace GerenciamentoEstoque.Api.Controllers
             return NoContent();
         }
         [HttpGet]
-        [Route("api/itemloja/{id}")]
+        [Route("/itemloja/{id}")]
         public async Task<IActionResult> GetItemLoja(int id)
         {
             try
@@ -113,8 +113,7 @@ namespace GerenciamentoEstoque.Api.Controllers
             }
             catch (Exception)
             {
-
-                throw;
+                return StatusCode(500, "Ocorreu um erro ao buscar item na loja.");
             }
         }
 

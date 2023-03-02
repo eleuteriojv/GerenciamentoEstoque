@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Editar Produto";
 }
+<br />
 <h3>Editar Produto</h3>
 <hr />
 <div class="text-body">
@@ -25,10 +26,10 @@
                     <input asp-for="Preco" type="text" class="form-control" />
                     <span asp-validation-for="Preco" class="text-danger"></span>
                 </div>
+                <hr />
                 <div class="form-group">
                     <input type="button" class="btn btn-danger" value="Voltar" onclick="history.back()">
                     <input type="submit" value="Salvar" class="btn btn-success" />
-
                 </div>
             </form>
         </div>

@@ -4,7 +4,7 @@
     ViewData["Title"] = "Remover Item da Loja";
 }
 
-
+<br />
 <div>
     <h3>Remover Item da Loja</h3>
     <br />
@@ -35,8 +35,8 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Lojas.Nome)
         </dd>
-
     </dl>
+    <hr />
     <form asp-action="Delete">
         <input type="hidden" asp-for="LojaId"/>
         <input type="hidden" asp-for="Quantidade" />
