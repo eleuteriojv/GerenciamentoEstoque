@@ -19,18 +19,5 @@ namespace UnitTest.Authentication
 
             Assert.NotNull(token);
         }
-
-        [Fact]
-        public void DadoRecebimentoDeDoisValores_DeveRetornarSoma()
-        {
-            var a = 10;
-            var b = 15;
-
-            var resultado = Soma(a, b);
-
-            Assert.Equal(25, resultado);
-        }
-
-        public int Soma(int a, int b) => a + b;
     }
 }
